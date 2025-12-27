@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Portfolio Flipbook</title>
+    <style>
+        /* 1. RESET */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #333;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 2. CONTAINER STYLES */
+        /* The library applies its own styles, but we need a wrapper to center it */
+        .book-wrapper {
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* 3. PAGE STYLES */
+        .page {
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #c2c2c2;
+            overflow: hidden;
+        }
+
+        /* Hard Cover Styles */
+        .page.--cover {
+            background: #2c3e50;
+            color: white;
+            border: none;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Typography & Images */
+        h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { font-size: 1.5rem; color: #444; margin-bottom: 10px; }
+        p { font-size: 1rem; color: #666; line-height: 1.5; }
+        .page.--cover p { color: #ccc; }
+        
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 15px 0;
+        }
+
+        /* Class for full size images */
+        .full-page-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* This crops the image to fill the box without stretching */
+            display: block;
+            margin: 0 !important;
+        }
+
+        /* Removes padding just for pages with full images */
+        .page.no-padding {
+            padding: 0; 
+        }
+
+        /* Page Numbers */
+        .footer {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="book">
+        
+        <div class="page --cover">
+            <div class="page-content">
+                <h1>Mit The Front End Developer</h1>
+                <p>2026 Creativity</p>
+                <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.7;">Click or Drag corners to open</p>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <h2>Introduction</h2>
+                <p>Welcome to a modern flipbook experience.</p>
+                <p> pure JavaScript coding by MJ.</p>
+                <div class="footer">1</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <img src="https://picsum.photos/300/200?random=1" alt="Design 1">
+                <p>Smooth shadows and gradients are handled automatically by JS.</p>
+                <div class="footer">2</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <h2>Test Title 1</h2>
+                <p>You can layout text just like a normal webpage.</p>
+                <div class="footer">3</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <h2>Test Title 2</h2>
+                <p>You can layout text just like a normal webpage.</p>
+                <div class="footer">4</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <h2>Test Title 3</h2>
+                <p>You can layout text just like a normal webpage.</p>
+                <div class="footer">5</div>
+            </div>
+        </div>
+
+        <div class="page">
+            <div class="page-content">
+                <img src="https://picsum.photos/300/200?random=2" alt="Design 2">
+                <p>Images scale perfectly within the container.</p>
+                <div class="footer">6</div>
+            </div>
+        </div>
+
+        <div class="page no-padding">
+            <img src="https://picsum.photos/1080/1920?random=2" class="full-page-img" alt="full page art">
+        </div>
+
+        <div class="page no-padding">
+            <img src="https://picsum.photos/1080/1920?random=2" class="full-page-img" alt="full page art">
+        </div>
+
+        <div class="page --cover">
+            <div class="page-content">
+                <h2>The End</h2>
+                <p>Thank you for viewing.</p>
+                <p>Contact: Mit Joshi</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. Get the reference to the library (it lives on the global 'St' object)
+            const pageFlip = new St.PageFlip(document.getElementById('book'), {
+                width: 400, // Width of ONE page
+                height: 500,
+                
+                // Sizing
+                size: "fixed", // Or "stretch" for responsive
+                
+                // Animation defaults
+                minWidth: 315,
+                maxWidth: 1000,
+                minHeight: 420,
+                maxHeight: 1350,
+                
+                // Behavior
+                maxShadowOpacity: 0.5, // How dark the shadows are
+                showCover: true, // Should the first page be single?
+                mobileScrollSupport: false // Prevents scrolling on mobile while flipping
+            });
+
+            // 2. Load pages from the HTML divs we created
+            // The library finds all child elements and turns them into pages
+            pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+            // 3. Optional: Add keyboard controls
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'ArrowLeft') {
+                    pageFlip.flipPrev();
+                }
+                if (e.code === 'ArrowRight') {
+                    pageFlip.flipNext();
+                }
+            });
+
+            // 4. Console log for debugging
+            console.log("PageFlip initialized with " + pageFlip.getPageCount() + " pages.");
+        });
+    </script>
+
+</body>
+</html>
