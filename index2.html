@@ -19,11 +19,10 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Prevent body scroll */
         }
 
         /* 2. CONTAINER STYLES */
-        /* The library applies its own styles, but we need a wrapper to center it */
         .book-wrapper {
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
@@ -70,17 +69,15 @@
         .full-page-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* This crops the image to fill the box without stretching */
+            object-fit: cover;
             display: block;
             margin: 0 !important;
         }
 
-        /* Removes padding just for pages with full images */
         .page.no-padding {
             padding: 0; 
         }
 
-        /* Page Numbers */
         .footer {
             position: absolute;
             bottom: 15px;
@@ -88,6 +85,52 @@
             text-align: center;
             font-size: 12px;
             color: #999;
+        }
+
+        /* --- MOBILE CONTROLS (Hidden on Desktop) --- */
+        .mobile-controls {
+            display: none; /* Hidden by default */
+        }
+
+        /* --- MOBILE RESPONSIVE STYLES --- */
+        @media (max-width: 768px) {
+            body {
+                /* On mobile, we might need a column layout to fit buttons below */
+                flex-direction: column; 
+                justify-content: center;
+            }
+
+            #book {
+                /* Ensure book doesn't overflow mobile width */
+                max-width: 100vw; 
+            }
+
+            /* Show controls on mobile */
+            .mobile-controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 90%;
+                margin-top: 20px;
+                z-index: 100;
+            }
+
+            .control-btn {
+                background-color: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                color: white;
+                padding: 12px 25px;
+                border-radius: 30px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.3s;
+                user-select: none;
+                backdrop-filter: blur(5px);
+            }
+
+            .control-btn:active {
+                background-color: rgba(255, 255, 255, 0.5);
+            }
         }
         
     </style>
@@ -103,11 +146,9 @@
         <div class="page no-padding">
             <img src="webp/2.jpg" class="full-page-img" alt="full page art 1">
         </div>
-
         <div class="page no-padding">
             <img src="webp/3.jpg" class="full-page-img" alt="full page art 1">
         </div>
-
         <div class="page no-padding">
             <img src="webp/4.jpg" class="full-page-img" alt="full page art 1">
         </div>
@@ -243,80 +284,12 @@
         <div class="page no-padding --cover">
             <img src="webp/48.jpg" class="full-page-img" alt="full page art 1">
         </div>
-        
-        <!-- <div class="page --cover">
-            <div class="page-content">
-                <h1>Mit The Front End Developer</h1>
-                <p>2026 Creativity</p>
-                <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.7;">Click or Drag corners to open</p>
-            </div>
-        </div>
 
-        <div class="page">
-            <div class="page-content">
-                <h2>Introduction</h2>
-                <p>Welcome to a modern flipbook experience.</p>
-                <p> pure JavaScript coding by MJ.</p>
-                <div class="footer">1</div>
-            </div>
-        </div>
+    </div>
 
-        <div class="page">
-            <div class="page-content">
-                <img src="https://picsum.photos/300/200?random=1" alt="Design 1">
-                <p>Smooth shadows and gradients are handled automatically by JS.</p>
-                <div class="footer">2</div>
-            </div>
-        </div>
-
-        <div class="page">
-            <div class="page-content">
-                <h2>Test Title 1</h2>
-                <p>You can layout text just like a normal webpage.</p>
-                <div class="footer">3</div>
-            </div>
-        </div>
-
-        <div class="page">
-            <div class="page-content">
-                <h2>Test Title 2</h2>
-                <p>You can layout text just like a normal webpage.</p>
-                <div class="footer">4</div>
-            </div>
-        </div>
-
-        <div class="page">
-            <div class="page-content">
-                <h2>Test Title 3</h2>
-                <p>You can layout text just like a normal webpage.</p>
-                <div class="footer">5</div>
-            </div>
-        </div>
-
-        <div class="page">
-            <div class="page-content">
-                <img src="https://picsum.photos/300/200?random=2" alt="Design 2">
-                <p>Images scale perfectly within the container.</p>
-                <div class="footer">6</div>
-            </div>
-        </div>
-
-        <div class="page no-padding">
-            <img src="https://picsum.photos/2480/3508?random=2" class="full-page-img" alt="full page art 1">
-        </div>
-
-        <div class="page no-padding">
-            <img src="https://picsum.photos/2480/3508?random=1" class="full-page-img" alt="full page art 2">
-        </div>
-
-        <div class="page --cover">
-            <div class="page-content">
-                <h2>The End</h2>
-                <p>Thank you for viewing.</p>
-                <p>Contact: Mit Joshi</p>
-            </div>
-        </div> -->
-
+    <div class="mobile-controls">
+        <button id="prevBtn" class="control-btn">Prev</button>
+        <button id="nextBtn" class="control-btn">Next</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
@@ -324,15 +297,32 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            // 1. Get the reference to the library (it lives on the global 'St' object)
+            // --- DETECT DEVICE TYPE ---
+            const isMobile = window.innerWidth < 768; // Adjust breakpoint as needed
+
+            // --- CONFIGURATION ---
+            // Desktop (Default) values
+            let bookWidth = 525;
+            let bookHeight = 750;
+            let sizeMode = "fixed";
+
+            // Mobile overrides
+            if (isMobile) {
+                // Calculate width to fit screen with some margin (e.g. 90% of screen width)
+                bookWidth = window.innerWidth * 0.9;
+                
+                // Calculate height based on original aspect ratio (750 / 525 = 1.428)
+                const aspectRatio = 750 / 525;
+                bookHeight = bookWidth * aspectRatio;
+            }
+
+            // 1. Get the reference to the library
             const pageFlip = new St.PageFlip(document.getElementById('book'), {
-                // width: 400, 
-                // height: 575,
-                width: 525, 
-                height: 750,
+                width: bookWidth, 
+                height: bookHeight,
                 
                 // Sizing
-                size: "fixed", // Or "stretch" for responsive
+                size: sizeMode,
                 
                 // Animation defaults
                 minWidth: 315,
@@ -341,16 +331,15 @@
                 maxHeight: 1350,
                 
                 // Behavior
-                maxShadowOpacity: 0.5, // How dark the shadows are
-                showCover: true, // Should the first page be single?
-                mobileScrollSupport: false // Prevents scrolling on mobile while flipping
+                maxShadowOpacity: 0.5, 
+                showCover: true, 
+                mobileScrollSupport: false
             });
 
-            // 2. Load pages from the HTML divs we created
-            // The library finds all child elements and turns them into pages
+            // 2. Load pages
             pageFlip.loadFromHTML(document.querySelectorAll('.page'));
 
-            // 3. Optional: Add keyboard controls
+            // 3. Keyboard controls (Desktop)
             document.addEventListener('keydown', (e) => {
                 if (e.code === 'ArrowLeft') {
                     pageFlip.flipPrev();
@@ -360,8 +349,19 @@
                 }
             });
 
-            // 4. Console log for debugging
-            // console.log("PageFlip initialized with " + pageFlip.getPageCount() + " pages.");
+            // 4. Mobile Button Controls
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => {
+                    pageFlip.flipPrev();
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    pageFlip.flipNext();
+                });
+            }
         });
     </script>
 
